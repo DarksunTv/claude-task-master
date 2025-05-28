@@ -20,7 +20,15 @@ function getClient(apiKey, baseUrl) {
  * @throws {Error} If API call fails.
  */
 export async function generateOpenAIText(params) {
-	const { apiKey, modelId, messages, maxTokens, temperature, baseUrl } = params;
+	const {
+		apiKey,
+		modelId,
+		messages,
+		temperature,
+		baseUrl,
+		contextWindowTokens,
+		maxOutputTokens
+	} = params;
 	log('debug', `generateOpenAIText called with model: ${modelId}`);
 
 	if (!apiKey) {
@@ -39,7 +47,7 @@ export async function generateOpenAIText(params) {
 		const result = await generateText({
 			model: openaiClient(modelId),
 			messages,
-			maxTokens,
+			maxTokens: maxOutputTokens,
 			temperature
 		});
 
@@ -82,7 +90,15 @@ export async function generateOpenAIText(params) {
  * @throws {Error} If API call fails.
  */
 export async function streamOpenAIText(params) {
-	const { apiKey, modelId, messages, maxTokens, temperature, baseUrl } = params;
+	const {
+		apiKey,
+		modelId,
+		messages,
+		temperature,
+		baseUrl,
+		contextWindowTokens,
+		maxOutputTokens
+	} = params;
 	log('debug', `streamOpenAIText called with model: ${modelId}`);
 
 	if (!apiKey) {
@@ -102,7 +118,7 @@ export async function streamOpenAIText(params) {
 	try {
 		const stream = await openaiClient.chat.stream(messages, {
 			model: modelId,
-			max_tokens: maxTokens,
+			max_tokens: maxOutputTokens,
 			temperature
 		});
 
@@ -137,9 +153,10 @@ export async function generateOpenAIObject(params) {
 		messages,
 		schema,
 		objectName,
-		maxTokens,
 		temperature,
-		baseUrl
+		baseUrl,
+		contextWindowTokens,
+		maxOutputTokens
 	} = params;
 	log(
 		'debug',
@@ -163,7 +180,7 @@ export async function generateOpenAIObject(params) {
 			schema: schema,
 			messages: messages,
 			mode: 'tool',
-			maxTokens: maxTokens,
+			maxTokens: maxOutputTokens,
 			temperature: temperature
 		});
 

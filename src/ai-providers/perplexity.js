@@ -5,11 +5,10 @@
  * using the Vercel AI SDK.
  */
 import { createPerplexity } from '@ai-sdk/perplexity';
-import { generateText, streamText, generateObject, streamObject } from 'ai';
+import { generateText, streamText, generateObject } from 'ai';
 import { log } from '../../scripts/modules/utils.js';
 
 // --- Client Instantiation ---
-// Similar to Anthropic, this expects the resolved API key to be passed in.
 function getClient(apiKey, baseUrl) {
 	if (!apiKey) {
 		throw new Error('Perplexity API key is required.');
@@ -29,19 +28,21 @@ function getClient(apiKey, baseUrl) {
  * @param {string} params.apiKey - The Perplexity API key.
  * @param {string} params.modelId - The specific Perplexity model ID.
  * @param {Array<object>} params.messages - The messages array.
- * @param {number} [params.maxTokens] - Maximum tokens for the response.
  * @param {number} [params.temperature] - Temperature for generation.
  * @param {string} [params.baseUrl] - Base URL for the Perplexity API.
- * @returns {Promise<string>} The generated text content.
+ * @param {number} [params.contextWindowTokens] - Optional: Max context tokens for the model.
+ * @param {number} [params.maxOutputTokens] - Optional: Max tokens for the response.
+ * @returns {Promise<object>} The generated text content and usage.
  * @throws {Error} If the API call fails.
  */
 export async function generatePerplexityText({
 	apiKey,
 	modelId,
 	messages,
-	maxTokens,
 	temperature,
-	baseUrl
+	baseUrl,
+	contextWindowTokens,
+	maxOutputTokens
 }) {
 	log('debug', `Generating Perplexity text with model: ${modelId}`);
 	try {
@@ -49,7 +50,7 @@ export async function generatePerplexityText({
 		const result = await generateText({
 			model: client(modelId),
 			messages: messages,
-			maxTokens: maxTokens,
+			maxTokens: maxOutputTokens,
 			temperature: temperature
 		});
 		log(
@@ -77,9 +78,10 @@ export async function generatePerplexityText({
  * @param {string} params.apiKey - The Perplexity API key.
  * @param {string} params.modelId - The specific Perplexity model ID.
  * @param {Array<object>} params.messages - The messages array.
- * @param {number} [params.maxTokens] - Maximum tokens for the response.
  * @param {number} [params.temperature] - Temperature for generation.
  * @param {string} [params.baseUrl] - Base URL for the Perplexity API.
+ * @param {number} [params.contextWindowTokens] - Optional: Max context tokens for the model.
+ * @param {number} [params.maxOutputTokens] - Optional: Max tokens for the response.
  * @returns {Promise<object>} The full stream result object from the Vercel AI SDK.
  * @throws {Error} If the API call fails to initiate the stream.
  */
@@ -87,9 +89,10 @@ export async function streamPerplexityText({
 	apiKey,
 	modelId,
 	messages,
-	maxTokens,
 	temperature,
-	baseUrl
+	baseUrl,
+	contextWindowTokens,
+	maxOutputTokens
 }) {
 	log('debug', `Streaming Perplexity text with model: ${modelId}`);
 	try {
@@ -97,7 +100,7 @@ export async function streamPerplexityText({
 		const stream = await streamText({
 			model: client(modelId),
 			messages: messages,
-			maxTokens: maxTokens,
+			maxTokens: maxOutputTokens,
 			temperature: temperature
 		});
 		return stream;
@@ -120,11 +123,12 @@ export async function streamPerplexityText({
  * @param {Array<object>} params.messages - The messages array.
  * @param {import('zod').ZodSchema} params.schema - The Zod schema for the object.
  * @param {string} params.objectName - A name for the object/tool.
- * @param {number} [params.maxTokens] - Maximum tokens for the response.
  * @param {number} [params.temperature] - Temperature for generation.
  * @param {number} [params.maxRetries] - Max retries for validation/generation.
  * @param {string} [params.baseUrl] - Base URL for the Perplexity API.
- * @returns {Promise<object>} The generated object matching the schema.
+ * @param {number} [params.contextWindowTokens] - Optional: Max context tokens for the model.
+ * @param {number} [params.maxOutputTokens] - Optional: Max tokens for the response.
+ * @returns {Promise<object>} The generated object matching the schema and usage.
  * @throws {Error} If generation or validation fails or is unsupported.
  */
 export async function generatePerplexityObject({
@@ -133,10 +137,11 @@ export async function generatePerplexityObject({
 	messages,
 	schema,
 	objectName = 'generated_object',
-	maxTokens,
 	temperature,
 	maxRetries = 1,
-	baseUrl
+	baseUrl,
+	contextWindowTokens,
+	maxOutputTokens
 }) {
 	log(
 		'debug',
@@ -152,7 +157,7 @@ export async function generatePerplexityObject({
 			model: client(modelId),
 			schema: schema,
 			messages: messages,
-			maxTokens: maxTokens,
+			maxTokens: maxOutputTokens,
 			temperature: temperature,
 			maxRetries: maxRetries
 		});

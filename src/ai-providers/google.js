@@ -30,7 +30,9 @@ function getClient(apiKey, baseUrl) {
  * @param {string} params.modelId - Specific model ID to use (overrides default).
  * @param {number} params.temperature - Generation temperature.
  * @param {Array<object>} params.messages - The conversation history (system/user prompts).
- * @param {number} [params.maxTokens] - Optional max tokens.
+ * @param {number} [params.maxOutputTokens] - Optional max tokens.
+ * @param {string} [params.baseUrl] - Optional base URL.
+ * @param {number} [params.contextWindowTokens] - Optional context window tokens.
  * @returns {Promise<string>} The generated text content.
  * @throws {Error} If API key is missing or API call fails.
  */
@@ -39,8 +41,9 @@ async function generateGoogleText({
 	modelId = DEFAULT_MODEL,
 	temperature = DEFAULT_TEMPERATURE,
 	messages,
-	maxTokens,
-	baseUrl
+	baseUrl,
+	contextWindowTokens,
+	maxOutputTokens
 }) {
 	if (!apiKey) {
 		throw new Error('Google API key is required.');
@@ -54,7 +57,7 @@ async function generateGoogleText({
 			model,
 			messages,
 			temperature,
-			maxOutputTokens: maxTokens
+			maxOutputTokens: maxOutputTokens
 		});
 
 		// Assuming result structure provides text directly or within a property
@@ -84,7 +87,9 @@ async function generateGoogleText({
  * @param {string} params.modelId - Specific model ID to use (overrides default).
  * @param {number} params.temperature - Generation temperature.
  * @param {Array<object>} params.messages - The conversation history.
- * @param {number} [params.maxTokens] - Optional max tokens.
+ * @param {number} [params.maxOutputTokens] - Optional max tokens.
+ * @param {string} [params.baseUrl] - Optional base URL.
+ * @param {number} [params.contextWindowTokens] - Optional context window tokens.
  * @returns {Promise<ReadableStream>} A readable stream of text deltas.
  * @throws {Error} If API key is missing or API call fails.
  */
@@ -93,8 +98,9 @@ async function streamGoogleText({
 	modelId = DEFAULT_MODEL,
 	temperature = DEFAULT_TEMPERATURE,
 	messages,
-	maxTokens,
-	baseUrl
+	baseUrl,
+	contextWindowTokens,
+	maxOutputTokens
 }) {
 	if (!apiKey) {
 		throw new Error('Google API key is required.');
@@ -108,7 +114,7 @@ async function streamGoogleText({
 			model,
 			messages,
 			temperature,
-			maxOutputTokens: maxTokens
+			maxOutputTokens: maxOutputTokens
 		});
 		return stream;
 	} catch (error) {
@@ -130,7 +136,9 @@ async function streamGoogleText({
  * @param {Array<object>} params.messages - The conversation history.
  * @param {import('zod').ZodSchema} params.schema - Zod schema for the expected object.
  * @param {string} params.objectName - Name for the object generation context.
- * @param {number} [params.maxTokens] - Optional max tokens.
+ * @param {number} [params.maxOutputTokens] - Optional max tokens.
+ * @param {string} [params.baseUrl] - Optional base URL.
+ * @param {number} [params.contextWindowTokens] - Optional context window tokens.
  * @returns {Promise<object>} The generated object matching the schema.
  * @throws {Error} If API key is missing or API call fails.
  */
@@ -141,8 +149,9 @@ async function generateGoogleObject({
 	messages,
 	schema,
 	objectName, // Note: Vercel SDK might use this differently or not at all
-	maxTokens,
-	baseUrl
+	baseUrl,
+	contextWindowTokens,
+	maxOutputTokens
 }) {
 	if (!apiKey) {
 		throw new Error('Google API key is required.');
@@ -157,7 +166,7 @@ async function generateGoogleObject({
 			schema,
 			messages,
 			temperature,
-			maxOutputTokens: maxTokens
+			maxOutputTokens: maxOutputTokens
 		});
 
 		// return object; // Return the parsed object

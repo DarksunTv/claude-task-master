@@ -375,56 +375,70 @@ function getOllamaBaseUrl(explicitRoot = null) {
  */
 function getParametersForRole(role, explicitRoot = null) {
 	const roleConfig = getModelConfigForRole(role, explicitRoot);
-	const roleMaxTokens = roleConfig.maxTokens;
 	const roleTemperature = roleConfig.temperature;
 	const modelId = roleConfig.modelId;
 	const providerName = roleConfig.provider;
 
-	let effectiveMaxTokens = roleMaxTokens; // Start with the role's default
+	// Default/fallback values from roleConfig (original .taskmasterconfig values)
+	let fallbackMaxOutputTokens = roleConfig.maxTokens; 
+	let fallbackContextWindowTokens = roleConfig.maxTokens; // Or undefined, or some other default
+
+	let contextWindowTokensToReturn = fallbackContextWindowTokens;
+	let maxOutputTokensToReturn = fallbackMaxOutputTokens;
 
 	try {
 		// Find the model definition in MODEL_MAP
-		const providerModels = MODEL_MAP[providerName];
+		const providerModels = MODEL_MAP[providerName?.toLowerCase()]; // Ensure providerName is lowercased for lookup
 		if (providerModels && Array.isArray(providerModels)) {
 			const modelDefinition = providerModels.find((m) => m.id === modelId);
 
-			// Check if a model-specific max_tokens is defined and valid
-			if (
-				modelDefinition &&
-				typeof modelDefinition.max_tokens === 'number' &&
-				modelDefinition.max_tokens > 0
-			) {
-				const modelSpecificMaxTokens = modelDefinition.max_tokens;
-				// Use the minimum of the role default and the model specific limit
-				effectiveMaxTokens = Math.min(roleMaxTokens, modelSpecificMaxTokens);
-				log(
-					'debug',
-					`Applying model-specific max_tokens (${modelSpecificMaxTokens}) for ${modelId}. Effective limit: ${effectiveMaxTokens}`
-				);
+			if (modelDefinition) {
+				// Use values from supported-models.json if found
+				contextWindowTokensToReturn = modelDefinition.contextWindowTokens;
+				maxOutputTokensToReturn = modelDefinition.maxOutputTokens;
+
+				// Validate that these are numbers, otherwise revert to fallback
+				if (typeof contextWindowTokensToReturn !== 'number') {
+					log('warn', `Invalid contextWindowTokens for ${providerName}/${modelId} in MODEL_MAP. Using fallback.`);
+					contextWindowTokensToReturn = fallbackContextWindowTokens;
+				}
+				if (typeof maxOutputTokensToReturn !== 'number') {
+					log('warn', `Invalid maxOutputTokens for ${providerName}/${modelId} in MODEL_MAP. Using fallback.`);
+					maxOutputTokensToReturn = fallbackMaxOutputTokens;
+				}
+
+				if (getDebugFlag()) {
+					log(
+						'debug',
+						`Parameters for ${providerName}/${modelId} (Role: ${role}): contextWindowTokens: ${contextWindowTokensToReturn}, maxOutputTokens: ${maxOutputTokensToReturn}, temperature: ${roleTemperature}`
+					);
+				}
 			} else {
 				log(
-					'debug',
-					`No valid model-specific max_tokens override found for ${modelId}. Using role default: ${roleMaxTokens}`
+					'warn',
+					`No model definition found for ${providerName}/${modelId} in MODEL_MAP. Using role defaults from .taskmasterconfig for token limits.`
 				);
+				// Values already set to fallbacks above
 			}
 		} else {
 			log(
-				'debug',
-				`No model definitions found for provider ${providerName} in MODEL_MAP. Using role default maxTokens: ${roleMaxTokens}`
+				'warn',
+				`No provider entry for '${providerName}' found in MODEL_MAP. Using role defaults from .taskmasterconfig for token limits.`
 			);
+			// Values already set to fallbacks above
 		}
 	} catch (lookupError) {
 		log(
 			'warn',
-			`Error looking up model-specific max_tokens for ${modelId}: ${lookupError.message}. Using role default: ${roleMaxTokens}`
+			`Error looking up model-specific token limits for ${providerName}/${modelId}: ${lookupError.message}. Using role defaults.`
 		);
-		// Fallback to role default on error
-		effectiveMaxTokens = roleMaxTokens;
+		// Values already set to fallbacks above in case of error
 	}
 
 	return {
-		maxTokens: effectiveMaxTokens,
-		temperature: roleTemperature
+		temperature: roleTemperature,
+		contextWindowTokens: contextWindowTokensToReturn,
+		maxOutputTokens: maxOutputTokensToReturn
 	};
 }
 

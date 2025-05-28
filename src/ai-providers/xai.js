@@ -38,9 +38,10 @@ export async function generateXaiText({
 	apiKey,
 	modelId,
 	messages,
-	maxTokens,
 	temperature,
-	baseUrl
+	baseUrl,
+	contextWindowTokens,
+	maxOutputTokens
 }) {
 	log('debug', `Generating xAI text with model: ${modelId}`);
 	try {
@@ -48,7 +49,7 @@ export async function generateXaiText({
 		const result = await generateText({
 			model: client(modelId),
 			messages: messages,
-			maxTokens: maxTokens,
+			maxTokens: maxOutputTokens,
 			temperature: temperature
 		});
 		log(
@@ -86,9 +87,10 @@ export async function streamXaiText({
 	apiKey,
 	modelId,
 	messages,
-	maxTokens,
 	temperature,
-	baseUrl
+	baseUrl,
+	contextWindowTokens,
+	maxOutputTokens
 }) {
 	log('debug', `Streaming xAI text with model: ${modelId}`);
 	try {
@@ -96,7 +98,7 @@ export async function streamXaiText({
 		const stream = await streamText({
 			model: client(modelId),
 			messages: messages,
-			maxTokens: maxTokens,
+			maxTokens: maxOutputTokens,
 			temperature: temperature
 		});
 		return stream;
@@ -130,10 +132,11 @@ export async function generateXaiObject({
 	messages,
 	schema,
 	objectName = 'generated_xai_object',
-	maxTokens,
 	temperature,
 	maxRetries = 3,
-	baseUrl
+	baseUrl,
+	contextWindowTokens,
+	maxOutputTokens
 }) {
 	log(
 		'warn',
@@ -152,7 +155,7 @@ export async function generateXaiObject({
 				description: `Generate a ${objectName} based on the prompt.`,
 				parameters: schema
 			},
-			maxTokens: maxTokens,
+			maxTokens: maxOutputTokens,
 			temperature: temperature,
 			maxRetries: maxRetries
 		});

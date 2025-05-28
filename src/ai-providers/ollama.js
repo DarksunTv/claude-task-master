@@ -25,17 +25,19 @@ function getClient(baseUrl) {
  * @param {string} params.modelId - Specific model ID to use (overrides default).
  * @param {number} params.temperature - Generation temperature.
  * @param {Array<object>} params.messages - The conversation history (system/user prompts).
- * @param {number} [params.maxTokens] - Optional max tokens.
+ * @param {number} [params.maxOutputTokens] - Optional max tokens.
  * @param {string} [params.baseUrl] - Optional Ollama base URL.
+ * @param {number} [params.contextWindowTokens] - Optional context window tokens.
  * @returns {Promise<string>} The generated text content.
  * @throws {Error} If API call fails.
  */
 async function generateOllamaText({
 	modelId = DEFAULT_MODEL,
 	messages,
-	maxTokens,
 	temperature = DEFAULT_TEMPERATURE,
-	baseUrl
+	baseUrl,
+	contextWindowTokens,
+	maxOutputTokens
 }) {
 	log('info', `Generating text with Ollama model: ${modelId}`);
 
@@ -44,7 +46,7 @@ async function generateOllamaText({
 		const result = await generateText({
 			model: client(modelId),
 			messages,
-			maxTokens,
+			maxTokens: maxOutputTokens,
 			temperature
 		});
 		log('debug', `Ollama generated text: ${result.text}`);
@@ -71,8 +73,9 @@ async function generateOllamaText({
  * @param {string} params.modelId - Specific model ID to use (overrides default).
  * @param {number} params.temperature - Generation temperature.
  * @param {Array<object>} params.messages - The conversation history.
- * @param {number} [params.maxTokens] - Optional max tokens.
+ * @param {number} [params.maxOutputTokens] - Optional max tokens.
  * @param {string} [params.baseUrl] - Optional Ollama base URL.
+ * @param {number} [params.contextWindowTokens] - Optional context window tokens.
  * @returns {Promise<ReadableStream>} A readable stream of text deltas.
  * @throws {Error} If API call fails.
  */
@@ -80,18 +83,19 @@ async function streamOllamaText({
 	modelId = DEFAULT_MODEL,
 	temperature = DEFAULT_TEMPERATURE,
 	messages,
-	maxTokens,
-	baseUrl
+	baseUrl,
+	contextWindowTokens,
+	maxOutputTokens
 }) {
 	log('info', `Streaming text with Ollama model: ${modelId}`);
 
 	try {
 		const ollama = getClient(baseUrl);
 		const stream = await streamText({
-			model: modelId,
+			model: ollama(modelId),
 			messages,
 			temperature,
-			maxTokens
+			maxTokens: maxOutputTokens
 		});
 		return stream;
 	} catch (error) {
@@ -112,9 +116,10 @@ async function streamOllamaText({
  * @param {Array<object>} params.messages - The conversation history.
  * @param {import('zod').ZodSchema} params.schema - Zod schema for the expected object.
  * @param {string} params.objectName - Name for the object generation context.
- * @param {number} [params.maxTokens] - Optional max tokens.
+ * @param {number} [params.maxOutputTokens] - Optional max tokens.
  * @param {number} [params.maxRetries] - Max retries for validation/generation.
  * @param {string} [params.baseUrl] - Optional Ollama base URL.
+ * @param {number} [params.contextWindowTokens] - Optional context window tokens.
  * @returns {Promise<object>} The generated object matching the schema.
  * @throws {Error} If generation or validation fails.
  */
@@ -124,9 +129,10 @@ async function generateOllamaObject({
 	messages,
 	schema,
 	objectName = 'generated_object',
-	maxTokens,
 	maxRetries = 3,
-	baseUrl
+	baseUrl,
+	contextWindowTokens,
+	maxOutputTokens
 }) {
 	log('info', `Generating object with Ollama model: ${modelId}`);
 	try {
@@ -140,7 +146,7 @@ async function generateOllamaObject({
 				name: objectName,
 				description: `Generate a ${objectName} based on the prompt.`
 			},
-			maxOutputTokens: maxTokens,
+			maxOutputTokens: maxOutputTokens,
 			temperature: temperature,
 			maxRetries: maxRetries
 		});

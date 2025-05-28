@@ -27,9 +27,10 @@ async function generateOpenRouterText({
 	apiKey,
 	modelId,
 	messages,
-	maxTokens,
 	temperature,
 	baseUrl,
+	contextWindowTokens,
+	maxOutputTokens,
 	...rest // Capture any other Vercel AI SDK compatible parameters
 }) {
 	if (!apiKey) throw new Error('OpenRouter API key is required.');
@@ -45,7 +46,7 @@ async function generateOpenRouterText({
 		const result = await generateText({
 			model,
 			messages,
-			maxTokens,
+			maxTokens: maxOutputTokens,
 			temperature,
 			...rest // Pass any additional parameters
 		});
@@ -109,9 +110,10 @@ async function streamOpenRouterText({
 	apiKey,
 	modelId,
 	messages,
-	maxTokens,
 	temperature,
 	baseUrl,
+	contextWindowTokens,
+	maxOutputTokens,
 	...rest
 }) {
 	if (!apiKey) throw new Error('OpenRouter API key is required.');
@@ -127,7 +129,7 @@ async function streamOpenRouterText({
 		const stream = await streamText({
 			model,
 			messages,
-			maxTokens,
+			maxTokens: maxOutputTokens,
 			temperature,
 			...rest
 		});
@@ -168,9 +170,10 @@ async function generateOpenRouterObject({
 	messages,
 	objectName = 'generated_object',
 	maxRetries = 3,
-	maxTokens,
 	temperature,
 	baseUrl,
+	contextWindowTokens,
+	maxOutputTokens,
 	...rest
 }) {
 	if (!apiKey) throw new Error('OpenRouter API key is required.');
@@ -194,7 +197,7 @@ async function generateOpenRouterObject({
 				parameters: schema
 			},
 			messages,
-			maxTokens,
+			maxTokens: maxOutputTokens,
 			temperature,
 			maxRetries,
 			...rest

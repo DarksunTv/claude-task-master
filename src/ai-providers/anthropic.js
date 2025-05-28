@@ -57,9 +57,11 @@ export async function generateAnthropicText({
 	apiKey,
 	modelId,
 	messages,
-	maxTokens,
+	// maxTokens, // Will be replaced by maxOutputTokens
 	temperature,
-	baseUrl
+	baseUrl,
+	contextWindowTokens, // Added for Task 84
+	maxOutputTokens      // Added for Task 84
 }) {
 	log('debug', `Generating Anthropic text with model: ${modelId}`);
 	try {
@@ -67,7 +69,7 @@ export async function generateAnthropicText({
 		const result = await generateText({
 			model: client(modelId),
 			messages: messages,
-			maxTokens: maxTokens,
+			maxTokens: maxOutputTokens, // Use maxOutputTokens here
 			temperature: temperature
 			// Beta header moved to client initialization
 			// TODO: Add other relevant parameters like topP, topK if needed
@@ -108,9 +110,11 @@ export async function streamAnthropicText({
 	apiKey,
 	modelId,
 	messages,
-	maxTokens,
+	// maxTokens, // Will be replaced by maxOutputTokens
 	temperature,
-	baseUrl
+	baseUrl,
+	contextWindowTokens, // Added for Task 84
+	maxOutputTokens      // Added for Task 84
 }) {
 	log('debug', `Streaming Anthropic text with model: ${modelId}`);
 	try {
@@ -123,7 +127,7 @@ export async function streamAnthropicText({
 				{
 					modelId: modelId,
 					messages: messages,
-					maxTokens: maxTokens,
+					maxTokens: maxOutputTokens, // Use maxOutputTokens here
 					temperature: temperature
 				},
 				null,
@@ -134,7 +138,7 @@ export async function streamAnthropicText({
 		const stream = await streamText({
 			model: client(modelId),
 			messages: messages,
-			maxTokens: maxTokens,
+			maxTokens: maxOutputTokens, // Use maxOutputTokens here
 			temperature: temperature
 			// TODO: Add other relevant parameters
 		});
@@ -172,10 +176,12 @@ export async function generateAnthropicObject({
 	messages,
 	schema,
 	objectName = 'generated_object',
-	maxTokens,
+	// maxTokens, // Will be replaced by maxOutputTokens
 	temperature,
 	maxRetries = 3,
-	baseUrl
+	baseUrl,
+	contextWindowTokens, // Added for Task 84
+	maxOutputTokens      // Added for Task 84
 }) {
 	log(
 		'debug',
@@ -185,7 +191,7 @@ export async function generateAnthropicObject({
 		const client = getClient(apiKey, baseUrl);
 		log(
 			'debug',
-			`Using maxTokens: ${maxTokens}, temperature: ${temperature}, model: ${modelId}`
+			`Using maxTokens: ${maxOutputTokens}, temperature: ${temperature}, model: ${modelId}` // Log maxOutputTokens
 		);
 		const result = await generateObject({
 			model: client(modelId),
@@ -196,7 +202,7 @@ export async function generateAnthropicObject({
 				name: objectName,
 				description: `Generate a ${objectName} based on the prompt.`
 			},
-			maxTokens: maxTokens,
+			maxTokens: maxOutputTokens, // Use maxOutputTokens here
 			temperature: temperature,
 			maxRetries: maxRetries
 		});

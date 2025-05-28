@@ -354,7 +354,8 @@ async function _unifiedServiceRunner(serviceType, params) {
 			providerApiFn,
 			baseUrl,
 			providerResponse,
-			telemetryData = null;
+			telemetryData = null,
+			modelEntry = null; // Initialize modelEntry
 
 		try {
 			log('info', `New AI service call with role: ${currentRole}`);
@@ -409,6 +410,24 @@ async function _unifiedServiceRunner(serviceType, params) {
 
 			roleParams = getParametersForRole(currentRole, effectiveProjectRoot);
 			baseUrl = getBaseUrlForRole(currentRole, effectiveProjectRoot);
+			
+			// Find the model entry from MODEL_MAP
+			if (MODEL_MAP && MODEL_MAP[providerName?.toLowerCase()]) {
+				modelEntry = MODEL_MAP[providerName.toLowerCase()].find(m => m.id === modelId);
+			}
+
+			if (!modelEntry) {
+				log('warn', `Could not find model entry for ${providerName}/${modelId} in supported-models.json. Default token limits will be used or call might fail if provider requires them.`);
+				// modelEntry will remain null, callParams will use roleParams.maxTokens as fallback
+			} else {
+				if (getDebugFlag()) {
+					log('info', `Model entry found for ${modelId}:`, { 
+						contextWindowTokens: modelEntry.contextWindowTokens, 
+						maxOutputTokens: modelEntry.maxOutputTokens 
+					});
+				}
+			}
+
 			providerFnSet = PROVIDER_FUNCTIONS[providerName?.toLowerCase()];
 			if (!providerFnSet) {
 				log(
@@ -473,10 +492,15 @@ async function _unifiedServiceRunner(serviceType, params) {
 			const callParams = {
 				apiKey,
 				modelId,
-				maxTokens: roleParams.maxTokens,
+				// Use roleParams.maxOutputTokens, which incorporates MODEL_MAP lookup and fallbacks.
+				max_tokens: roleParams.maxOutputTokens, 
 				temperature: roleParams.temperature,
 				messages,
 				baseUrl,
+				// Pass contextWindowTokens and maxOutputTokens from roleParams
+				// for provider functions to use.
+				contextWindowTokens: roleParams.contextWindowTokens,
+				maxOutputTokens: roleParams.maxOutputTokens,
 				...(serviceType === 'generateObject' && { schema, objectName }),
 				...restApiParams
 			};
