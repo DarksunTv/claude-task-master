@@ -1,0 +1,66 @@
+# Task ID: 93
+# Title: Test Add-Task with Anthropic Sonnet 4 as Research Model
+# Status: pending
+# Dependencies: 5, 54, 92
+# Priority: medium
+# Description: Implement and test the add-task command's integration with Anthropic Sonnet 4 model specifically for the research functionality, ensuring optimal performance with the latest model version.
+# Details:
+This task involves updating and testing the add-task command to specifically utilize Anthropic's Sonnet 4 model for research functionality:
+
+1. Review the current implementation of the research flag in the add-task command (from Task 54)
+2. Update the AI service configuration to support Sonnet 4 as an option for the research model:
+   - Modify ai-services.js or ai-services-unified.js to include Sonnet 4 model parameters
+   - Update model selection logic to properly handle Sonnet 4 for research operations
+   - Ensure proper token limits and configuration settings for Sonnet 4
+
+3. Implement model-specific prompt engineering optimizations for Sonnet 4:
+   - Adjust research prompts to leverage Sonnet 4's capabilities
+   - Optimize context window usage for research queries
+   - Implement proper error handling for Sonnet 4-specific responses
+
+4. Add configuration options to specify Sonnet 4 as the default research model:
+   - Update config-manager.js to include a researchModel setting
+   - Implement command-line flag to override the default (--model=sonnet4)
+   - Ensure backward compatibility with existing configurations
+
+5. Implement performance monitoring for research operations:
+   - Track token usage specifically for research operations
+   - Measure response times and quality metrics
+   - Compare results with previous model versions
+
+6. Update documentation to reflect the new model option:
+   - Update help text for the add-task command
+   - Document configuration options for research models
+   - Provide usage examples specific to Sonnet 4 research
+
+# Test Strategy:
+1. Unit Testing:
+   - Create unit tests for the updated AI service configuration with Sonnet 4
+   - Test model selection logic with various configuration settings
+   - Verify proper error handling for Sonnet 4-specific API responses
+
+2. Integration Testing:
+   - Test the add-task command with the --research flag using Sonnet 4
+   - Verify that research results are properly incorporated into task creation
+   - Test with various research topics of different complexity levels
+   - Ensure the command works with both default settings and explicit model selection
+
+3. Performance Testing:
+   - Measure and compare token usage between different models for similar research queries
+   - Evaluate response quality and relevance for technical topics
+   - Test with large context research scenarios to verify context window utilization
+
+4. Configuration Testing:
+   - Verify that model selection works through both command-line flags and configuration files
+   - Test backward compatibility with existing configurations
+   - Ensure proper fallback behavior if Sonnet 4 is unavailable
+
+5. Manual Testing Scenarios:
+   - Create a new task with research on "GraphQL optimization techniques"
+   - Create a task researching "Modern CI/CD pipelines"
+   - Research a complex technical topic like "Distributed systems consensus algorithms"
+   - Compare research quality with previous model versions on the same topics
+
+6. Documentation Verification:
+   - Verify that help text and documentation accurately reflect the new functionality
+   - Ensure examples in documentation work as described

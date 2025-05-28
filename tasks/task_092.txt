@@ -1,0 +1,56 @@
+# Task ID: 92
+# Title: Test Add-Task with Direct Anthropic Model Integration After Billing Update
+# Status: pending
+# Dependencies: 5, 83, 85, 88
+# Priority: medium
+# Description: Implement and test the add-task command's direct integration with Anthropic models following the recent billing structure and token limit updates.
+# Details:
+This task involves verifying and ensuring the add-task command works correctly with the updated Anthropic API integration after billing changes:
+
+1. Review the current implementation of add-task and its interaction with Anthropic models
+2. Verify that the updated token limit configurations (maxInputTokens and maxOutputTokens) are properly applied when using add-task
+3. Implement test cases that exercise the add-task command with various input sizes to ensure proper token management
+4. Test the add-task command with the following scenarios:
+   - Creating a simple task with minimal description
+   - Creating a complex task with detailed requirements
+   - Creating a task with the --research flag enabled
+   - Creating a task with dependencies specified
+5. Monitor and log token usage during these operations to ensure compliance with new billing structure
+6. Update any hardcoded token limits or model references in the add-task implementation
+7. Ensure proper error handling for cases where token limits are exceeded
+8. Verify that the correct model version is being used (claude-3-opus, claude-3-sonnet, etc.)
+9. Check that the system correctly calculates and displays token usage information to users
+10. Document any changes made to the add-task command's interaction with Anthropic models
+
+The implementation should prioritize efficiency in token usage while maintaining the quality of generated task content. Any issues discovered during testing should be documented and addressed.
+
+# Test Strategy:
+1. Unit Testing:
+   - Create mock responses for Anthropic API calls to test different scenarios
+   - Verify token counting logic works correctly with different input sizes
+   - Test error handling when token limits are exceeded
+
+2. Integration Testing:
+   - Execute the add-task command with various inputs and verify correct API calls
+   - Confirm that the correct model parameters are being passed to the Anthropic API
+   - Verify that maxInputTokens and maxOutputTokens are respected in API calls
+
+3. End-to-End Testing:
+   - Run the add-task command with the following test cases:
+     a. `taskmaster add-task "Simple test task"` - verify basic functionality
+     b. `taskmaster add-task "Complex task with many details" --details "Long detailed description..."` - test with larger inputs
+     c. `taskmaster add-task "Research task" --research` - test research flag integration
+     d. `taskmaster add-task "Dependent task" --dependencies 5,83,88` - test with dependencies
+
+4. Performance Testing:
+   - Measure response times for add-task operations with different input sizes
+   - Compare token usage metrics before and after implementation
+
+5. Validation:
+   - Examine the tasks.json file to ensure created tasks have correct structure
+   - Verify that token usage information is correctly logged
+   - Check that appropriate error messages are displayed when limits are exceeded
+
+6. Documentation Testing:
+   - Verify that help text for add-task command reflects current functionality
+   - Ensure any changes to token handling are documented in user guides

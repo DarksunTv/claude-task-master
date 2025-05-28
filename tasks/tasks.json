@@ -5466,6 +5466,37 @@
           "parentTaskId": 91
         }
       ]
+    },
+    {
+      "id": 92,
+      "title": "Test Add-Task with Direct Anthropic Model Integration After Billing Update",
+      "description": "Implement and test the add-task command's direct integration with Anthropic models following the recent billing structure and token limit updates.",
+      "details": "This task involves verifying and ensuring the add-task command works correctly with the updated Anthropic API integration after billing changes:\n\n1. Review the current implementation of add-task and its interaction with Anthropic models\n2. Verify that the updated token limit configurations (maxInputTokens and maxOutputTokens) are properly applied when using add-task\n3. Implement test cases that exercise the add-task command with various input sizes to ensure proper token management\n4. Test the add-task command with the following scenarios:\n   - Creating a simple task with minimal description\n   - Creating a complex task with detailed requirements\n   - Creating a task with the --research flag enabled\n   - Creating a task with dependencies specified\n5. Monitor and log token usage during these operations to ensure compliance with new billing structure\n6. Update any hardcoded token limits or model references in the add-task implementation\n7. Ensure proper error handling for cases where token limits are exceeded\n8. Verify that the correct model version is being used (claude-3-opus, claude-3-sonnet, etc.)\n9. Check that the system correctly calculates and displays token usage information to users\n10. Document any changes made to the add-task command's interaction with Anthropic models\n\nThe implementation should prioritize efficiency in token usage while maintaining the quality of generated task content. Any issues discovered during testing should be documented and addressed.",
+      "testStrategy": "1. Unit Testing:\n   - Create mock responses for Anthropic API calls to test different scenarios\n   - Verify token counting logic works correctly with different input sizes\n   - Test error handling when token limits are exceeded\n\n2. Integration Testing:\n   - Execute the add-task command with various inputs and verify correct API calls\n   - Confirm that the correct model parameters are being passed to the Anthropic API\n   - Verify that maxInputTokens and maxOutputTokens are respected in API calls\n\n3. End-to-End Testing:\n   - Run the add-task command with the following test cases:\n     a. `taskmaster add-task \"Simple test task\"` - verify basic functionality\n     b. `taskmaster add-task \"Complex task with many details\" --details \"Long detailed description...\"` - test with larger inputs\n     c. `taskmaster add-task \"Research task\" --research` - test research flag integration\n     d. `taskmaster add-task \"Dependent task\" --dependencies 5,83,88` - test with dependencies\n\n4. Performance Testing:\n   - Measure response times for add-task operations with different input sizes\n   - Compare token usage metrics before and after implementation\n\n5. Validation:\n   - Examine the tasks.json file to ensure created tasks have correct structure\n   - Verify that token usage information is correctly logged\n   - Check that appropriate error messages are displayed when limits are exceeded\n\n6. Documentation Testing:\n   - Verify that help text for add-task command reflects current functionality\n   - Ensure any changes to token handling are documented in user guides",
+      "status": "pending",
+      "dependencies": [
+        5,
+        83,
+        85,
+        88
+      ],
+      "priority": "medium",
+      "subtasks": []
+    },
+    {
+      "id": 93,
+      "title": "Test Add-Task with Anthropic Sonnet 4 as Research Model",
+      "description": "Implement and test the add-task command's integration with Anthropic Sonnet 4 model specifically for the research functionality, ensuring optimal performance with the latest model version.",
+      "details": "This task involves updating and testing the add-task command to specifically utilize Anthropic's Sonnet 4 model for research functionality:\n\n1. Review the current implementation of the research flag in the add-task command (from Task 54)\n2. Update the AI service configuration to support Sonnet 4 as an option for the research model:\n   - Modify ai-services.js or ai-services-unified.js to include Sonnet 4 model parameters\n   - Update model selection logic to properly handle Sonnet 4 for research operations\n   - Ensure proper token limits and configuration settings for Sonnet 4\n\n3. Implement model-specific prompt engineering optimizations for Sonnet 4:\n   - Adjust research prompts to leverage Sonnet 4's capabilities\n   - Optimize context window usage for research queries\n   - Implement proper error handling for Sonnet 4-specific responses\n\n4. Add configuration options to specify Sonnet 4 as the default research model:\n   - Update config-manager.js to include a researchModel setting\n   - Implement command-line flag to override the default (--model=sonnet4)\n   - Ensure backward compatibility with existing configurations\n\n5. Implement performance monitoring for research operations:\n   - Track token usage specifically for research operations\n   - Measure response times and quality metrics\n   - Compare results with previous model versions\n\n6. Update documentation to reflect the new model option:\n   - Update help text for the add-task command\n   - Document configuration options for research models\n   - Provide usage examples specific to Sonnet 4 research",
+      "testStrategy": "1. Unit Testing:\n   - Create unit tests for the updated AI service configuration with Sonnet 4\n   - Test model selection logic with various configuration settings\n   - Verify proper error handling for Sonnet 4-specific API responses\n\n2. Integration Testing:\n   - Test the add-task command with the --research flag using Sonnet 4\n   - Verify that research results are properly incorporated into task creation\n   - Test with various research topics of different complexity levels\n   - Ensure the command works with both default settings and explicit model selection\n\n3. Performance Testing:\n   - Measure and compare token usage between different models for similar research queries\n   - Evaluate response quality and relevance for technical topics\n   - Test with large context research scenarios to verify context window utilization\n\n4. Configuration Testing:\n   - Verify that model selection works through both command-line flags and configuration files\n   - Test backward compatibility with existing configurations\n   - Ensure proper fallback behavior if Sonnet 4 is unavailable\n\n5. Manual Testing Scenarios:\n   - Create a new task with research on \"GraphQL optimization techniques\"\n   - Create a task researching \"Modern CI/CD pipelines\"\n   - Research a complex technical topic like \"Distributed systems consensus algorithms\"\n   - Compare research quality with previous model versions on the same topics\n\n6. Documentation Verification:\n   - Verify that help text and documentation accurately reflect the new functionality\n   - Ensure examples in documentation work as described",
+      "status": "pending",
+      "dependencies": [
+        5,
+        54,
+        92
+      ],
+      "priority": "medium",
+      "subtasks": []
     }
   ]
 }
